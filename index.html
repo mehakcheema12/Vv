@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Arpit</title>
+    <style>
+        :root {
+            --bg-pink: #ffc0cb;
+            --envelope-blue: #a0d8de;
+            --heart-purple: #7a4a7d;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-pink);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Envelope Styles */
+        #envelope-container {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.5s;
+        }
+
+        .envelope {
+            width: 250px;
+            height: 180px;
+            background-color: var(--envelope-blue);
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .envelope::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-left: 125px solid transparent;
+            border-right: 125px solid transparent;
+            border-top: 100px solid #8ec5cb;
+            z-index: 2;
+        }
+
+        .heart {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--heart-purple);
+            font-size: 40px;
+            z-index: 3;
+        }
+
+        /* Card Styles */
+        #card {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-width: 90%;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .puzzle-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            grid-template-rows: repeat(3, 80px);
+            gap: 5px;
+            margin: 20px auto;
+            width: 250px;
+        }
+
+        .tile {
+            width: 80px;
+            height: 80px;
+            background-color: #eee;
+            background-size: 240px 240px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        /* Final View */
+        #celebration {
+            display: none;
+            text-align: center;
+        }
+
+        .btn-yes {
+            background-color: #ff4d6d;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="envelope-container" onclick="openCard()">
+        <div class="envelope">
+            <div class="heart">♥</div>
+        </div>
+    </div>
+
+    <div id="card">
+        <h2>Dear Arpit...</h2>
+        <div class="puzzle-grid" id="puzzle">
+            </div>
+        <div id="invite" style="display:none;">
+            <p>...you complete me.</p>
+            <h3>Will you be my Valentine?</h3>
+            <button class="btn-yes" onclick="showCelebration()">Yes</button>
+        </div>
+    </div>
+
+    <div id="celebration">
+        <h2 style="color: #ff4d6d;">Yay, I can't wait!</h2>
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJib3JmN2R4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l0HlIDUadRQC2WDRu/giphy.gif" width="300">
+        <br>
+        <button onclick="location.reload()" style="background:none; border:none; color:blue; cursor:pointer; margin-top:10px;">Reset</button>
+    </div>
+
+    <script>
+        const puzzleContainer = document.getElementById('puzzle');
+        const inviteSection = document.getElementById('invite');
+        let tiles = [0, 1, 2, 3, 4, 5, 6, 7, 8]; 
+        // Shuffle for Arpit
+        tiles.sort(() => Math.random() - 0.5);
+
+        function openCard() {
+            document.getElementById('envelope-container').style.display = 'none';
+            document.getElementById('card').style.display = 'block';
+            renderPuzzle();
+        }
+
+        function renderPuzzle() {
+            puzzleContainer.innerHTML = '';
+            tiles.forEach((tileNum, index) => {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                if (tileNum !== 8) { // 8 is the "empty" hole
+                    tile.style.backgroundImage = "url('your-photo.jpg')"; // Replace with your image
+                    const row = Math.floor(tileNum / 3);
+                    const col = tileNum % 3;
+                    tile.style.backgroundPosition = `-${col * 80}px -${row * 80}px`;
+                } else {
+                    tile.style.background = "white";
+                }
+                tile.onclick = () => moveTile(index);
+                puzzleContainer.appendChild(tile);
+            });
+            checkWin();
+        }
+
+        function moveTile(index) {
+            const emptyIndex = tiles.indexOf(8);
+            const validMoves = [index - 1, index + 1, index - 3, index + 3];
+            
+            if (validMoves.includes(emptyIndex)) {
+                [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
+                renderPuzzle();
+            }
+        }
+
+        function checkWin() {
+            if (tiles.every((val, i) => val === i)) {
+                inviteSection.style.display = 'block';
+                // Optional: Fill the last tile to complete the photo
+                document.querySelectorAll('.tile')[8].style.backgroundImage = "url('your-photo.jpg')";
+                document.querySelectorAll('.tile')[8].style.backgroundPosition = "-160px -160px";
+            }
+        }
+
+        function showCelebration() {
+            document.getElementById('card').style.display = 'none';
+            document.getElementById('celebration').style.display = 'block';
+            document.body.style.backgroundColor = "#ffebf0";
+        }
+    </script>
+</body>
+</html>
